@@ -12,7 +12,6 @@ public class Contract
     public DateOnly EndDate { get; set; }
     public ContractStatus Status { get; set; } = ContractStatus.Draft;
 
-    // "Nội dung bắt buộc" cho CTR-02 (giả định G1)
     public string? ServiceGroup { get; set; }
     public string? Content { get; set; }
 

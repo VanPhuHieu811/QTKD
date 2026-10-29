@@ -6,7 +6,6 @@ public enum CustomerStatus
     Inactive
 }
 
-// Ánh xạ từ sơ đồ trạng thái Phase 1 (xem docs/design-notes.md, mục 2)
 public enum ContractStatus
 {
     Draft,              // Draft (Soạn thảo / Bản nháp)
