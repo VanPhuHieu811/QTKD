@@ -18,7 +18,23 @@ public class CustomersController : ControllerBase
     // GET /api/customers
     [HttpGet]
     public async Task<ActionResult<List<CustomerDto>>> GetAll()
+        => Ok(await _service.GetAllAsync());
+
+    // GET /api/customers/{id}
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<CustomerDto>> GetById(int id)
+        => Ok(await _service.GetByIdAsync(id));
+
+    // POST /api/customers
+    [HttpPost]
+    public async Task<ActionResult<CustomerDto>> Create(CreateCustomerRequest request)
     {
-        return Ok(await _service.GetAllAsync());
+        var created = await _service.CreateAsync(request);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
+
+    // PUT /api/customers/{id}
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<CustomerDto>> Update(int id, UpdateCustomerRequest request)
+        => Ok(await _service.UpdateAsync(id, request));
 }

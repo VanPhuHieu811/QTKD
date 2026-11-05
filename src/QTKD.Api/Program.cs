@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
 using QTKD.Api.Data;
+using QTKD.Api.Middleware;
 using QTKD.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,11 +15,12 @@ builder.Services.AddDbContext<QtkdDbContext>(options =>
 
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<ContractService>();
+builder.Services.AddScoped<PriceListService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(o =>
     {
-        // Trả Status dạng chữ ("Draft") thay vì số
+        // Nhận và trả Status dạng chữ ("Draft") thay vì số
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
@@ -27,6 +28,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Middleware bắt lỗi nghiệp vụ, đặt đầu tiên để bao toàn bộ pipeline
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
