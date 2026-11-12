@@ -119,6 +119,13 @@ public class ContractService
             errors.Add("FileName tối đa 260 ký tự.");
         ThrowIfAny(errors);
 
+        // Kiểm tra trùng tên tệp đính kèm trong cùng một hợp đồng (không phân biệt hoa thường)
+        var lower = fileName!.ToLower();
+        if (await _db.ContractAttachments.AnyAsync(a => a.ContractId == id && a.FileName.ToLower() == lower))
+        {
+            throw new ConflictException("ATTACHMENT_EXISTS", $"Tệp đính kèm '{fileName}' đã tồn tại trong hợp đồng.");
+        }
+
         _db.ContractAttachments.Add(new ContractAttachment { ContractId = id, FileName = fileName! });
         await _db.SaveChangesAsync();
         return await GetByIdAsync(id);
