@@ -6,12 +6,14 @@ using QTKD.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Chuỗi kết nối lấy từ user-secrets (Development) hoặc biến môi trường, không commit mật khẩu
-var connectionString = builder.Configuration.GetConnectionString("Default")
-    ?? throw new InvalidOperationException("Thiếu ConnectionStrings:Default. Hãy cấu hình bằng dotnet user-secrets.");
-
-builder.Services.AddDbContext<QtkdDbContext>(options =>
-    options.UseNpgsql(connectionString));
+// Chuỗi kết nối được đọc lúc tạo DbContext (không đọc sớm), để project test có thể ghi đè
+// sang database kiểm thử. Mật khẩu lấy từ user-secrets hoặc biến môi trường, không commit lên Git.
+builder.Services.AddDbContext<QtkdDbContext>((serviceProvider, options) =>
+{
+    var connectionString = serviceProvider.GetRequiredService<IConfiguration>().GetConnectionString("Default")
+        ?? throw new InvalidOperationException("Thiếu ConnectionStrings:Default. Hãy cấu hình bằng dotnet user-secrets.");
+    options.UseNpgsql(connectionString);
+});
 
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<ContractService>();
@@ -42,3 +44,6 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+// Cho phép project test dùng WebApplicationFactory<Program>
+public partial class Program { }

@@ -3,7 +3,7 @@ using QTKD.Api.Exceptions;
 
 namespace QTKD.Api.Services;
 
-// Các quy tắc nghiệp vụ của hợp đồng, viết dạng static để dễ unit test ở tuần 07.
+// Các quy tắc nghiệp vụ của hợp đồng
 public static class ContractRules
 {
     // ---------- CTR-01: chỉ được sửa khi Draft hoặc RevisionRequested ----------
@@ -19,7 +19,7 @@ public static class ContractRules
     }
 
     // ---------- CTR-02: điều kiện để gửi trình duyệt ----------
-    // Contract phải được nạp kèm Customer và Attachments. Trả về danh sách điều kiện chưa đạt (rỗng = hợp lệ).
+    // Contract phải được nạp kèm Customer và Attachments. Trả về danh sách điều kiện chưa đạt (rỗng = hợp lệ)
     public static List<string> GetSubmitErrors(Contract contract)
     {
         var errors = new List<string>();
