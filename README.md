@@ -80,7 +80,7 @@ docs/           tài liệu thiết kế
 
 ## Tài liệu
 
-- [Ghi chú thiết kế, giả định, thay đổi so với Phase 1](docs/design-notes.md)
+- [Ghi chú thiết kế, giả định, thay đổi so với Phase 1](docs/design-note-th5.md)
 - [Các thành phần của solution](docs/solution-overview.md)
 - [Tài liệu API](docs/api.md)
 - [Báo cáo kiểm thử](docs/test-report.md)

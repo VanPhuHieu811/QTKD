@@ -189,12 +189,10 @@ Hợp đồng không ở `Draft` (ví dụ `Approved`), 409:
 | Yêu cầu | Nội dung | Đoạn xử lý | Cách kiểm tra |
 |---|---|---|---|
 | AC01 | Không có quyền thì từ chối | Chưa cài đặt (giả định G5) | Ghi rõ trong báo cáo |
-| AC02 | Sai trạng thái thì từ chối | `ContractService.SubmitAsync` (hai nhánh kiểm tra `Status`) | Submit hợp đồng `Approved` hoặc `PendingApproval`: 409 |
-| AC03 | Không đạt CTR-02 thì không tạo quy trình và trả danh sách điều kiện chưa đạt | `ContractRules.GetSubmitErrors`, ném `ValidationFailedException("CTR-02")` trong `SubmitAsync` | Submit hợp đồng thiếu nội dung/tệp: 400, DB không đổi |
-| AC04 | Đủ điều kiện thì tạo yêu cầu phê duyệt và chuyển `PendingApproval` | `ContractService.SubmitAsync` (tạo `ApprovalRequest`, `ContractHistory`, đổi `Status`) | Submit hợp đồng hợp lệ: 200, bảng `ApprovalRequests` có 1 dòng |
-| AC05 | Gửi lặp hoặc đồng thời không tạo nhiều phiên | Nhánh `ALREADY_SUBMITTED` trong `SubmitAsync` và unique index lọc trên `ApprovalRequests` (`QtkdDbContext`) | Submit lần hai: 409, không có dòng mới |
-| CTR-01 | Chỉ sửa khi `Draft` hoặc `RevisionRequested` | `ContractRules.EnsureEditable`, gọi trong `UpdateAsync` và `AddAttachmentAsync` | PUT hợp đồng `PendingApproval`: 409 `CTR-01` |
-| CTR-02 | Chỉ gửi khi khách hàng, thời gian hiệu lực, nội dung/tệp hợp lệ | `ContractRules.GetSubmitErrors` | Thiếu một điều kiện: 400, trạng thái vẫn `Draft` |
-| CTR-03 | Không chuyển thẳng `Draft` sang `Approved` | `ContractRules.EnsureCanTransition` (gọi trong `SubmitAsync`, chỉ cho `Draft` sang `PendingApproval`) | Unit test tuần 07 (TC07); Submit thành công chỉ ra `PendingApproval` |
-
-Ghi chú: khi nộp, bổ sung số dòng của từng đoạn mã trong repository vào cột "Đoạn xử lý".
+| AC02 | Sai trạng thái thì từ chối | `ContractService.SubmitAsync` (`ContractService.cs#L145-L157`) | Submit hợp đồng `Approved` hoặc `PendingApproval`: 409 |
+| AC03 | Không đạt CTR-02 thì không tạo quy trình và trả danh sách điều kiện chưa đạt | `ContractRules.GetSubmitErrors` (`ContractRules.cs#L23-L40`), ném `ValidationFailedException("CTR-02")` trong `SubmitAsync` (`ContractService.cs#L160-L165`) | Submit hợp đồng thiếu nội dung/tệp: 400, DB không đổi |
+| AC04 | Đủ điều kiện thì tạo yêu cầu phê duyệt và chuyển `PendingApproval` | `ContractService.SubmitAsync` (`ContractService.cs#L170-L192`: tạo `ApprovalRequest`, `ContractHistory`, đổi `Status`) | Submit hợp đồng hợp lệ: 200, bảng `ApprovalRequests` có 1 dòng |
+| AC05 | Gửi lặp hoặc đồng thời không tạo nhiều phiên | Nhánh `ALREADY_SUBMITTED` (`ContractService.cs#L145-L150`), catch lỗi trùng (`ContractService.cs#L193-L199`) và unique index lọc trên `ApprovalRequests` (`QtkdDbContext.cs#L85-L88`) | Submit lần hai: 409, không có dòng mới |
+| CTR-01 | Chỉ sửa khi `Draft` hoặc `RevisionRequested` | `ContractRules.EnsureEditable` (`ContractRules.cs#L10-L19`), gọi trong `UpdateAsync` (`ContractService.cs#L89`) và `AddAttachmentAsync` (`ContractService.cs#L112`) | PUT hợp đồng `PendingApproval`: 409 `CTR-01` |
+| CTR-02 | Chỉ gửi khi khách hàng, thời gian hiệu lực, nội dung/tệp hợp lệ | `ContractRules.GetSubmitErrors` (`ContractRules.cs#L23-L40`) | Thiếu một điều kiện: 400, trạng thái vẫn `Draft` |
+| CTR-03 | Không chuyển thẳng `Draft` sang `Approved` | `ContractRules.EnsureCanTransition` (`ContractRules.cs#L62-L77`, gọi trong `SubmitAsync` `ContractService.cs#L168`) | Unit test tuần 07 (TC07); Submit thành công chỉ ra `PendingApproval` |
